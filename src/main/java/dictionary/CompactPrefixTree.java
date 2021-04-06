@@ -36,24 +36,8 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the word is in the dictionary, false otherwise
      */
     public boolean check(String word) {
-        if (this.root == null || (this.root.prefix == "" && this.root.isWord)) {
-            return false;
-        }
 
         return check(word.toLowerCase(), root); // Calling private check method
-    }
-
-    public boolean checkPrefix(String prefix, String word) {
-        if (prefix.length() >= word.length()) {
-            return false;
-        } else {
-            for (int i = 0; i < prefix.length(); i++) {
-                if (prefix.charAt(i) != word.charAt(i)) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     /**
@@ -142,8 +126,27 @@ public class CompactPrefixTree implements Dictionary {
      */
     private boolean check(String s, Node node) {
         // FILL IN CODE
-
-        return false; // don't forget to change it
+        if (node == null) {
+            return false;
+        }
+        if (node.isWord) {
+            if (node.prefix.length() == s.length()) {
+                for (int i = 0; i < node.prefix.length(); i++) {
+                    if (node.prefix.charAt(i) != s.charAt(i)) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (!checkPrefix(s, node)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 
     /**
@@ -155,8 +158,18 @@ public class CompactPrefixTree implements Dictionary {
      */
     private boolean checkPrefix(String prefix, Node node) {
         // FILL IN CODE
-
-        return false; // don't forget to change it
+        String word = node.prefix;
+        if (prefix.length() >= word.length()) {
+            return false;
+        } else {
+            for (int i = 0; i < prefix.length(); i++) {
+                if (prefix.charAt(i) != word.charAt(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        //return false; // don't forget to change it
     }
 
     // You might want to create a private recursive helper method for toString
