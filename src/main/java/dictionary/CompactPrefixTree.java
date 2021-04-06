@@ -152,8 +152,13 @@ public class CompactPrefixTree implements Dictionary {
             }
         }
     }
-    private boolean checkPrefixForNode(String prefix, Node node) {
-        String word = node.prefix;
+
+    /* A helper method for check().
+    *
+    * @param prefix =
+    * */
+    private boolean checkPrefixForNode(String word, Node node) {
+        String prefix = node.prefix;
         if (prefix.length() >= word.length()) {
             return false;
         } else {
