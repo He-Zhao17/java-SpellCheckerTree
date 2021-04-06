@@ -1,6 +1,9 @@
 package dictionary;
 
 import javax.print.DocFlavor;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /** CompactPrefixTree class, implements Dictionary ADT and
  *  several additional methods. Can be used as a spell checker.
@@ -66,7 +69,7 @@ public class CompactPrefixTree implements Dictionary {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         // FILL IN CODE
-
+        sb.append(treeToString(root, 0));
         return sb.toString();
     }
 
@@ -77,9 +80,34 @@ public class CompactPrefixTree implements Dictionary {
      */
     public void printTree(String filename) {
         // FILL IN CODE
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+            out.write(this.toString());
+            out.close();
+        } catch (IOException e) {
+
+        }
         // Uses toString() method; outputs info to a file
+    }
 
-
+    /**
+     * Get the String of a tree.
+     * @param node the tree.
+     * @param numIndentations deepth of the tree;
+     */
+    private String treeToString(Node node, int numIndentations) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < numIndentations; i++) {
+            res.append(" ");
+        }
+        res.append(node.prefix);
+        res.append("\n");
+        for (int i = 0; i < 26; i++) {
+            if (node.children[i] != null) {
+                res.append(treeToString(node.children[i], numIndentations + 1));
+            }
+        }
+        return res.toString();
     }
 
     /**
@@ -151,7 +179,7 @@ public class CompactPrefixTree implements Dictionary {
             Node tempNode = new Node();
             tempNode.prefix = temp;
             node.prefix = new String(node.prefix.substring(i));
-            int intChar = (int) node.prefix.charAt(0);
+            int intChar = (int) node.prefix.charAt(0) - 96;
             tempNode.children[intChar] = node;
             if (i == s.length()) {
                 tempNode.isWord = true;
@@ -160,7 +188,7 @@ public class CompactPrefixTree implements Dictionary {
                 Node newNode = new Node();
                 newNode.prefix = new String(s.substring(i));
                 newNode.isWord = true;
-                intChar = (int) newNode.prefix.charAt(0);
+                intChar = (int) newNode.prefix.charAt(0) - 96;
                 tempNode.children[intChar] = newNode;
             }
             return tempNode;
