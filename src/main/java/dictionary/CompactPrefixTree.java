@@ -36,7 +36,24 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the word is in the dictionary, false otherwise
      */
     public boolean check(String word) {
+        if (this.root == null || (this.root.prefix == "" && this.root.isWord)) {
+            return false;
+        }
+
         return check(word.toLowerCase(), root); // Calling private check method
+    }
+
+    public boolean checkPrefix(String prefix, String word) {
+        if (prefix.length() >= word.length()) {
+            return false;
+        } else {
+            for (int i = 0; i < prefix.length(); i++) {
+                if (prefix.charAt(i) != word.charAt(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     /**
