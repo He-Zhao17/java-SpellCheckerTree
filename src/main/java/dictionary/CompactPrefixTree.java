@@ -111,6 +111,9 @@ public class CompactPrefixTree implements Dictionary {
      */
     private Node add(String s, Node node) {
         // FILL IN CODE
+        if (node == null) {
+
+        }
 
 
         return null; // don't forget to change it
@@ -140,13 +143,26 @@ public class CompactPrefixTree implements Dictionary {
                 return false;
             }
         } else {
-            if (!checkPrefix(s, node)) {
+            if (!checkPrefixForNode(s, node)) {
                 return false;
             } else {
                 String temp = new String (s.substring(node.prefix.length()));
                 int intChar = (int) temp.charAt(0) - 96;
                 return check(temp, node.children[intChar]);
             }
+        }
+    }
+    private boolean checkPrefixForNode(String prefix, Node node) {
+        String word = node.prefix;
+        if (prefix.length() >= word.length()) {
+            return false;
+        } else {
+            for (int i = 0; i < prefix.length(); i++) {
+                if (prefix.charAt(i) != word.charAt(i)) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -159,18 +175,8 @@ public class CompactPrefixTree implements Dictionary {
      */
     private boolean checkPrefix(String prefix, Node node) {
         // FILL IN CODE
-        String word = node.prefix;
-        if (prefix.length() >= word.length()) {
-            return false;
-        } else {
-            for (int i = 0; i < prefix.length(); i++) {
-                if (prefix.charAt(i) != word.charAt(i)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        //return false; // don't forget to change it
+
+        return false; // don't forget to change it
     }
 
     // You might want to create a private recursive helper method for toString
