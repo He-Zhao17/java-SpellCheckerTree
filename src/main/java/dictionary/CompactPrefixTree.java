@@ -9,7 +9,12 @@ public class CompactPrefixTree implements Dictionary {
     private Node root; // the root of the tree
 
     /** Default constructor  */
-    public CompactPrefixTree() { }
+    public CompactPrefixTree() {
+        this.root = new Node();
+        this.root.prefix = "";
+        this.root.isWord = false;
+        this.root.children = new Node[26];
+    }
 
     /**
      * Creates a dictionary ("compact prefix tree")
@@ -112,8 +117,12 @@ public class CompactPrefixTree implements Dictionary {
     private Node add(String s, Node node) {
         // FILL IN CODE
         if (node == null) {
-
+            node = new Node();
+            node.prefix = s;
+            node.isWord = true;
+            return node;
         }
+
 
 
         return null; // don't forget to change it
@@ -131,17 +140,13 @@ public class CompactPrefixTree implements Dictionary {
         if (node == null) {
             return false;
         }
-        if (node.isWord) {
-            if (node.prefix.length() == s.length()) {
-                for (int i = 0; i < node.prefix.length(); i++) {
-                    if (node.prefix.charAt(i) != s.charAt(i)) {
-                        return false;
-                    }
+        if (node.isWord && node.prefix.length() == s.length()) {
+            for (int i = 0; i < node.prefix.length(); i++) {
+                if (node.prefix.charAt(i) != s.charAt(i)) {
+                    return false;
                 }
-                return true;
-            } else {
-                return false;
             }
+            return true;
         } else {
             if (!checkPrefixForNode(s, node)) {
                 return false;
@@ -153,10 +158,12 @@ public class CompactPrefixTree implements Dictionary {
         }
     }
 
-    /* A helper method for check().
-    *
-    * @param prefix =
-    * */
+    /** A private helper method of check().
+     *
+     * @param word the string to check.
+     * @param node the node to check.
+     * @return true if the node.prefix is in the prefix of the word, false otherwise
+     */
     private boolean checkPrefixForNode(String word, Node node) {
         String prefix = node.prefix;
         if (prefix.length() >= word.length()) {
