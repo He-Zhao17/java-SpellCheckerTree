@@ -270,8 +270,26 @@ public class CompactPrefixTree implements Dictionary {
      */
     private boolean checkPrefix(String prefix, Node node) {
         // FILL IN CODE
-
-        return false; // don't forget to change it
+        if (node == null) {
+            return false;
+        }
+        if (node.prefix.length() >= prefix.length()) {
+            for (int i = 0; i < prefix.length(); i++) {
+                if (prefix.charAt(i) != node.prefix.charAt(i)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            if (checkPrefixForNode(prefix, node)) {
+                String temp = new String (prefix.substring(node.prefix.length()));
+                int intChar = (int) temp.charAt(0) - (int) 'a';
+                return checkPrefix(temp, node.children[intChar]);
+            } else {
+                return false;
+            }
+        }
+        //return false; // don't forget to change it
     }
 
     // You might want to create a private recursive helper method for toString
