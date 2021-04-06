@@ -2,7 +2,10 @@ package dictionary;
 
 import javax.print.DocFlavor;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Stack;
 
 /** CompactPrefixTree class, implements Dictionary ADT and
  *  several additional methods. Can be used as a spell checker.
@@ -121,12 +124,80 @@ public class CompactPrefixTree implements Dictionary {
         // FILL IN CODE
         // Note: you need to create a private suggest method in this class
         // (like we did for methods add, check, checkPrefix)
+        ResultForSuggest res = new ResultForSuggest();
+        res.node = this.root;
+        res.prefix = "";
+        ResultForSuggest tempRes = getSuggestTree(word, res);
 
-
-        return null; // don't forget to change it
+        if (tempRes == null) {
+            return null;
+        } else {
+            ArrayList<String> k = treeToList(tempRes.node, tempRes.prefix);
+            if (k.size() > numSuggestions) {
+                String[] re = new String[numSuggestions];
+                for (int i = 0; i < numSuggestions; i++) {
+                    re[i] = k.get(i);
+                }
+                return re;
+            } else {
+                String[] re = new String[k.size()];
+                for (int i = 0; i < k.size(); i++) {
+                    re[i] = k.get(i);
+                }
+                return re;
+            }
+        }
+        //return null; // don't forget to change it
     }
 
     // ---------- Private helper methods ---------------
+    private ArrayList<String> treeToList(Node node, String prefix) {
+        ArrayList<String> res = new ArrayList<>();
+        if (node.isWord) {
+            res.add(new String(prefix + node.prefix));
+        }
+        for (int i = 0; i < 26; i++) {
+            if (node.children[i] != null) {
+                ArrayList<String> temp = treeToList(node.children[i], new String(prefix + node.prefix));
+                res.addAll(temp);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Get the node of input prefix.
+     * @param res the union of the tree and the had prefix.
+     * @param word the input prefix;
+     */
+    private ResultForSuggest getSuggestTree(String word, ResultForSuggest res) {
+        Node node = res.node;
+        String prefix = res.prefix;
+        word = word.toLowerCase();
+        if (node == null) {
+            return null;
+        }
+        if (node.prefix.length() < word.length()) {
+            if (checkPrefixForNode(word, node)) {
+                res.prefix = new String (prefix + node.prefix);
+                word = new String(word.substring(node.prefix.length()));
+                int intChar = (int) word.charAt(0) - (int) 'a';
+                res.node = node.children[intChar];
+                return getSuggestTree(word, res);
+            } else {
+                    return null;
+            }
+        } else {
+            for (int i = 0; i < word.length(); i++) {
+                if (word.charAt(i) != node.prefix.charAt(i)) {
+                    return null;
+                }
+            }
+            return res;
+        }
+
+
+    }
 
     /**
      * Get the String of a tree.
@@ -329,7 +400,14 @@ public class CompactPrefixTree implements Dictionary {
             return res.toString();
         }
 
+
+
         // FILL IN CODE: Add other methods to class Node as needed
+    }
+
+    private class ResultForSuggest{
+        Node node;
+        String prefix;
     }
 
     public static void main(String[] args) {
