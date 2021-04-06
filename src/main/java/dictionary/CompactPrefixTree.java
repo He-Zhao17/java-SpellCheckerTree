@@ -1,5 +1,7 @@
 package dictionary;
 
+import javax.print.DocFlavor;
+
 /** CompactPrefixTree class, implements Dictionary ADT and
  *  several additional methods. Can be used as a spell checker.
  *  Fill in code and feel free to add additional methods as needed.
@@ -122,10 +124,48 @@ public class CompactPrefixTree implements Dictionary {
             node.isWord = true;
             return node;
         }
-
-
-
-        return null; // don't forget to change it
+        String temp = s + "k";
+        if (s.length() == node.prefix.length() && checkPrefixForNode(temp, node)) {
+            if (!node.isWord) {
+                node.isWord = true;
+            }
+            return node;
+        }
+        if (checkPrefixForNode(s, node)) {
+            String tempStr = new String (s.substring(node.prefix.length()));
+            int intChar = (int) tempStr.charAt(0) - 96;
+            node.children[intChar] = add(tempStr, node.children[intChar]);
+            return node.children[intChar];
+        } else {
+            StringBuilder tempStrB = new StringBuilder();
+            int i  = 0;
+            while (i < node.prefix.length() && i < s.length()) {
+                if (node.prefix.charAt(i) == s.charAt(i)) {
+                    tempStrB.append(s.charAt(i));
+                    i++;
+                } else {
+                    break;
+                }
+            }
+            temp = tempStrB.toString();
+            Node tempNode = new Node();
+            tempNode.prefix = temp;
+            node.prefix = new String(node.prefix.substring(i));
+            int intChar = (int) node.prefix.charAt(0);
+            tempNode.children[intChar] = node;
+            if (i == s.length()) {
+                tempNode.isWord = true;
+            } else {
+                tempNode.isWord = false;
+                Node newNode = new Node();
+                newNode.prefix = new String(s.substring(i));
+                newNode.isWord = true;
+                intChar = (int) newNode.prefix.charAt(0);
+                tempNode.children[intChar] = newNode;
+            }
+            return tempNode;
+        }
+        //return null; // don't forget to change it
     }
 
 
