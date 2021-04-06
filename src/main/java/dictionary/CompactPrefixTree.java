@@ -36,7 +36,6 @@ public class CompactPrefixTree implements Dictionary {
      * @return true if the word is in the dictionary, false otherwise
      */
     public boolean check(String word) {
-
         return check(word.toLowerCase(), root); // Calling private check method
     }
 
@@ -144,7 +143,9 @@ public class CompactPrefixTree implements Dictionary {
             if (!checkPrefix(s, node)) {
                 return false;
             } else {
-                return true;
+                String temp = new String (s.substring(node.prefix.length()));
+                int intChar = (int) temp.charAt(0) - 96;
+                return check(temp, node.children[intChar]);
             }
         }
     }
@@ -193,6 +194,12 @@ public class CompactPrefixTree implements Dictionary {
         }
 
         // FILL IN CODE: Add other methods to class Node as needed
+    }
+
+    public static void main(String[] args) {
+        char c = 'a';
+        int k = (int) c;
+        System.out.println(k);
     }
 
 }
