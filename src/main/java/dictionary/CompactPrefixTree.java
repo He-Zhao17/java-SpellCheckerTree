@@ -1,9 +1,8 @@
 package dictionary;
 
 import javax.print.DocFlavor;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 /** CompactPrefixTree class, implements Dictionary ADT and
  *  several additional methods. Can be used as a spell checker.
@@ -15,10 +14,7 @@ public class CompactPrefixTree implements Dictionary {
 
     /** Default constructor  */
     public CompactPrefixTree() {
-        this.root = new Node();
-        this.root.prefix = "";
-        this.root.isWord = false;
-        this.root.children = new Node[26];
+        root = new Node();
     }
 
     /**
@@ -29,8 +25,21 @@ public class CompactPrefixTree implements Dictionary {
     public CompactPrefixTree(String filename) {
         // FILL IN CODE:
         // Read each word from the file, add it to the tree
+        root = new Node();
+        try {
+            String str = new String();
+            FileReader flReader = new FileReader(filename);
+            Scanner scan = new Scanner(flReader);
+            while (scan.hasNext()) {
+                str = scan.nextLine();
+                add(str);
+            }
+            flReader.close();
+            scan.close();
 
-
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /** Adds a given word to the dictionary.
@@ -90,25 +99,7 @@ public class CompactPrefixTree implements Dictionary {
         // Uses toString() method; outputs info to a file
     }
 
-    /**
-     * Get the String of a tree.
-     * @param node the tree.
-     * @param numIndentations deepth of the tree;
-     */
-    private String treeToString(Node node, int numIndentations) {
-        StringBuilder res = new StringBuilder();
-        for (int i = 0; i < numIndentations; i++) {
-            res.append(" ");
-        }
-        res.append(node.prefix);
-        res.append("\n");
-        for (int i = 0; i < 26; i++) {
-            if (node.children[i] != null) {
-                res.append(treeToString(node.children[i], numIndentations + 1));
-            }
-        }
-        return res.toString();
-    }
+
 
     /**
      * Return an array of the entries in the dictionary that are as close as possible to
@@ -138,6 +129,30 @@ public class CompactPrefixTree implements Dictionary {
     // ---------- Private helper methods ---------------
 
     /**
+     * Get the String of a tree.
+     * @param node the tree.
+     * @param numIndentations deepth of the tree;
+     */
+    private String treeToString(Node node, int numIndentations) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < numIndentations; i++) {
+            res.append(" ");
+        }
+        res.append(node.prefix);
+        if (node.isWord) {
+            res.append("*");
+        }
+        res.append("\n");
+        for (int i = 0; i < 26; i++) {
+            if (node.children[i] != null) {
+                res.append(treeToString(node.children[i], numIndentations + 1));
+            }
+        }
+        return res.toString();
+    }
+
+
+    /**
      *  A private add method that adds a given string to the tree
      * @param s the string to add
      * @param node the root of a tree where we want to add a new string
@@ -161,9 +176,9 @@ public class CompactPrefixTree implements Dictionary {
         }
         if (checkPrefixForNode(s, node)) {
             String tempStr = new String (s.substring(node.prefix.length()));
-            int intChar = (int) tempStr.charAt(0) - 96;
+            int intChar = (int) tempStr.charAt(0) - (int) 'a';
             node.children[intChar] = add(tempStr, node.children[intChar]);
-            return node.children[intChar];
+            return node;
         } else {
             StringBuilder tempStrB = new StringBuilder();
             int i  = 0;
@@ -179,7 +194,7 @@ public class CompactPrefixTree implements Dictionary {
             Node tempNode = new Node();
             tempNode.prefix = temp;
             node.prefix = new String(node.prefix.substring(i));
-            int intChar = (int) node.prefix.charAt(0) - 96;
+            int intChar = (int) node.prefix.charAt(0) - (int) 'a';
             tempNode.children[intChar] = node;
             if (i == s.length()) {
                 tempNode.isWord = true;
@@ -188,7 +203,7 @@ public class CompactPrefixTree implements Dictionary {
                 Node newNode = new Node();
                 newNode.prefix = new String(s.substring(i));
                 newNode.isWord = true;
-                intChar = (int) newNode.prefix.charAt(0) - 96;
+                intChar = (int) newNode.prefix.charAt(0) - (int) 'a';
                 tempNode.children[intChar] = newNode;
             }
             return tempNode;
@@ -220,7 +235,7 @@ public class CompactPrefixTree implements Dictionary {
                 return false;
             } else {
                 String temp = new String (s.substring(node.prefix.length()));
-                int intChar = (int) temp.charAt(0) - 96;
+                int intChar = (int) temp.charAt(0) - (int) 'a';
                 return check(temp, node.children[intChar]);
             }
         }
@@ -277,6 +292,23 @@ public class CompactPrefixTree implements Dictionary {
             isWord = false;
             prefix = "";
             children = new Node[26]; // initialize the array of children
+        }
+        public String toString() {
+            return NodeToString(this, 0);
+        }
+        public String NodeToString(Node node, int numIndentations) {
+            StringBuilder res = new StringBuilder();
+            for (int i = 0; i < numIndentations; i++) {
+                res.append(" ");
+            }
+            res.append(node.prefix);
+            res.append("\n");
+            for (int i = 0; i < 26; i++) {
+                if (node.children[i] != null) {
+                    res.append(treeToString(node.children[i], numIndentations + 1));
+                }
+            }
+            return res.toString();
         }
 
         // FILL IN CODE: Add other methods to class Node as needed
