@@ -132,19 +132,25 @@ public class CompactPrefixTree implements Dictionary {
         if (tempRes == null) {
             return new String[numSuggestions];
         } else {
-            ArrayList<String> k = treeToList(tempRes.node, tempRes.prefix);
-            if (k.size() > numSuggestions) {
-                String[] re = new String[numSuggestions];
-                for (int i = 0; i < numSuggestions; i++) {
-                    re[i] = k.get(i);
-                }
+            if ((tempRes.prefix + tempRes.node.prefix).equals(word)) {
+                String[] re = new String[1];
+                re[0] = word;
                 return re;
             } else {
-                String[] re = new String[k.size()];
-                for (int i = 0; i < k.size(); i++) {
-                    re[i] = k.get(i);
+                ArrayList<String> k = treeToList(tempRes.node, tempRes.prefix);
+                if (k.size() > numSuggestions) {
+                    String[] re = new String[numSuggestions];
+                    for (int i = 0; i < numSuggestions; i++) {
+                        re[i] = k.get(i);
+                    }
+                    return re;
+                } else {
+                    String[] re = new String[k.size()];
+                    for (int i = 0; i < k.size(); i++) {
+                        re[i] = k.get(i);
+                    }
+                    return re;
                 }
-                return re;
             }
         }
         //return null; // don't forget to change it
