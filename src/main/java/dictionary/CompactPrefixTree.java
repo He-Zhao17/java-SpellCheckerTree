@@ -130,7 +130,19 @@ public class CompactPrefixTree implements Dictionary {
         ResultForSuggest tempRes = getSuggestTree(word, res);
 
         if (tempRes == null) {
-            return new String[numSuggestions];
+            //return new String[numSuggestions];
+            if (word.length() == 1) {
+                ArrayList<String> k = treeToList(tempRes.node, tempRes.prefix);
+                String[] re = new String[numSuggestions];
+                for (int i = 0; i < numSuggestions; i++) {
+                    re[i] = k.get(i);
+                }
+                return re;
+            } else {
+                String tempStr = new String (word.substring(0, word.length() - 1));
+                return suggest(tempStr, numSuggestions);
+            }
+
         } else {
             if ((tempRes.prefix + tempRes.node.prefix).equals(word)) {
                 String[] re = new String[1];
