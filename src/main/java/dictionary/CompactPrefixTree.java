@@ -140,11 +140,11 @@ public class CompactPrefixTree implements Dictionary {
                 return re;
             } else {
                 String tempStr = new String (word.substring(0, word.length() - 1));
-                return suggest(tempStr, numSuggestions);
+                return getUpStringArr(tempStr, numSuggestions);
             }
 
         } else {
-            if ((tempRes.prefix + tempRes.node.prefix).equals(word)) {
+            if ((tempRes.prefix + tempRes.node.prefix).equals(word) && tempRes.node.isWord) {
                 String[] re = new String[1];
                 re[0] = word;
                 return re;
@@ -157,9 +157,42 @@ public class CompactPrefixTree implements Dictionary {
                     }
                     return re;
                 } else {
-                    String[] re = new String[k.size()];
+                    String[] re = new String[numSuggestions];
                     for (int i = 0; i < k.size(); i++) {
                         re[i] = k.get(i);
+                    }
+                    ResultForSuggest t = new ResultForSuggest();
+                    t.node = this.root;
+                    t.prefix = "";
+                    ResultForSuggest reUp = getSuggestTree(tempRes.prefix, t);
+                    Node nodeUp = reUp.node;
+                    int intChar = ((int) tempRes.node.prefix.charAt(0) - (int) 'a') % 26;
+                    int index = k.size();
+                    outer:
+                    while (index == numSuggestions) {
+                        for (int i = intChar + 1; i < 26; i++) {
+                            k = treeToList(nodeUp.children[i], new String (reUp.prefix + nodeUp.prefix));
+                            for (int j = 0; j < k.size(); j++) {
+                                if (index == numSuggestions) {
+                                    break outer;
+                                }
+                                re[index] = k.get(j);
+                                index++;
+                            }
+                        }
+                        for (int i = 0; i < intChar; i++) {
+                            k = treeToList(nodeUp.children[i], new String (reUp.prefix + nodeUp.prefix));
+                            for (int j = 0; j < k.size(); j++) {
+                                if (index == numSuggestions) {
+                                    break outer;
+                                }
+                                re[index] = k.get(j);
+                                index++;
+                            }
+                        }
+                        reUp = getSuggestTree(reUp.prefix, t);
+                        intChar = ((int) nodeUp.prefix.charAt(0) - (int) 'a') % 26;
+                        nodeUp = reUp.node;
                     }
                     return re;
                 }
@@ -169,8 +202,84 @@ public class CompactPrefixTree implements Dictionary {
     }
 
     // ---------- Private helper methods ---------------
+    private String[] getUpStringArr(String word, int numSuggestions) {
+        ResultForSuggest res = new ResultForSuggest();
+        res.node = this.root;
+        res.prefix = "";
+        ResultForSuggest tempRes = getSuggestTree(word, res);
+
+        if (tempRes == null) {
+            //return new String[numSuggestions];
+            if (word.length() == 1) {
+                ArrayList<String> k = treeToList(tempRes.node, tempRes.prefix);
+                String[] re = new String[numSuggestions];
+                for (int i = 0; i < numSuggestions; i++) {
+                    re[i] = k.get(i);
+                }
+                return re;
+            } else {
+                String tempStr = new String (word.substring(0, word.length() - 1));
+                return getUpStringArr(tempStr, numSuggestions);
+            }
+
+        } else {
+            ArrayList<String> k = treeToList(tempRes.node, tempRes.prefix);
+            if (k.size() > numSuggestions) {
+                String[] re = new String[numSuggestions];
+                for (int i = 0; i < numSuggestions; i++) {
+                    re[i] = k.get(i);
+                }
+                return re;
+            } else {
+                String[] re = new String[numSuggestions];
+                for (int i = 0; i < k.size(); i++) {
+                    re[i] = k.get(i);
+                }
+                ResultForSuggest t = new ResultForSuggest();
+                t.node = this.root;
+                t.prefix = "";
+                ResultForSuggest reUp = getSuggestTree(tempRes.prefix, t);
+                Node nodeUp = reUp.node;
+                int intChar = ((int) tempRes.node.prefix.charAt(0) - (int) 'a') % 26;
+                int index = k.size();
+                outer:
+                while (index < numSuggestions) {
+                    for (int i = intChar + 1; i < 26; i++) {
+                        k = treeToList(nodeUp.children[i], new String (reUp.prefix + nodeUp.prefix));
+                        for (int j = 0; j < k.size(); j++) {
+                            if (index == numSuggestions) {
+                                break outer;
+                            }
+                            re[index] = k.get(j);
+                            index++;
+                        }
+                    }
+                    for (int i = 0; i < intChar; i++) {
+                        k = treeToList(nodeUp.children[i], new String (reUp.prefix + nodeUp.prefix));
+                        for (int j = 0; j < k.size(); j++) {
+                            if (index == numSuggestions) {
+                                break outer;
+                            }
+                            re[index] = k.get(j);
+                            index++;
+                        }
+                    }
+                    reUp = getSuggestTree(reUp.prefix, t);
+                    intChar = ((int) nodeUp.prefix.charAt(0) - (int) 'a') % 26;
+                    nodeUp = reUp.node;
+                }
+                return re;
+            }
+        }
+    }
+
+
+
     private ArrayList<String> treeToList(Node node, String prefix) {
         ArrayList<String> res = new ArrayList<>();
+        if (node == null) {
+            return res;
+        }
         if (node.isWord) {
             res.add(new String(prefix + node.prefix));
         }
